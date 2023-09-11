@@ -162,11 +162,47 @@ create_APEX_instruction(APEX_Instruction *ins, char *buffer)
     switch (ins->opcode)
     {
         case OPCODE_ADD:
+        {
+            ins->rd = get_num_from_string(tokens[0]);
+            ins->rs1 = get_num_from_string(tokens[1]);
+            ins->rs2 = get_num_from_string(tokens[2]);
+            break;
+        }
         case OPCODE_SUB:
+        {
+            ins->rd = get_num_from_string(tokens[0]);
+            ins->rs1 = get_num_from_string(tokens[1]);
+            ins->rs2 = get_num_from_string(tokens[2]);
+            break;
+        }
         case OPCODE_MUL:
+        {
+            ins->rd = get_num_from_string(tokens[0]);
+            ins->rs1 = get_num_from_string(tokens[1]);
+            ins->rs2 = get_num_from_string(tokens[2]);
+            break;
+        }
         case OPCODE_DIV:
+        {
+            ins->rd = get_num_from_string(tokens[0]);
+            ins->rs1 = get_num_from_string(tokens[1]);
+            ins->rs2 = get_num_from_string(tokens[2]);
+            break;
+        }
         case OPCODE_AND:
+        {
+            ins->rd = get_num_from_string(tokens[0]);
+            ins->rs1 = get_num_from_string(tokens[1]);
+            ins->rs2 = get_num_from_string(tokens[2]);
+            break;
+        }
         case OPCODE_OR:
+        {
+            ins->rd = get_num_from_string(tokens[0]);
+            ins->rs1 = get_num_from_string(tokens[1]);
+            ins->rs2 = get_num_from_string(tokens[2]);
+            break;
+        }
         case OPCODE_XOR:
         {
             ins->rd = get_num_from_string(tokens[0]);

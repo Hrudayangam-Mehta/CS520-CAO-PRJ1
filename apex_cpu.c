@@ -29,11 +29,23 @@ print_instruction(const CPU_Stage *stage)
     switch (stage->opcode)
     {
         case OPCODE_ADD:
+        {
+            printf("%s,R%d,R%d,R%d ", stage->opcode_str, stage->rd, stage->rs1,
+                   stage->rs2);
+            break;
+        }
+
+
         case OPCODE_SUB:
+
         case OPCODE_MUL:
+
         case OPCODE_DIV:
+
         case OPCODE_AND:
+
         case OPCODE_OR:
+
         case OPCODE_XOR:
         {
             printf("%s,R%d,R%d,R%d ", stage->opcode_str, stage->rd, stage->rs1,
@@ -181,11 +193,7 @@ APEX_decode(APEX_CPU *cpu)
         switch (cpu->decode.opcode)
         {
             case OPCODE_ADD:
-            {
-                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
-                break;
-            }
+        
 
             case OPCODE_LOAD:
             {
@@ -226,6 +234,9 @@ APEX_execute(APEX_CPU *cpu)
         {
             case OPCODE_ADD:
             {
+                // cpu->execute.result_buffer = cpu->execute.rs1_value + cpu->execute.rs2_value;
+                // SetZero_Flag(cpu);
+                // break;
                 cpu->execute.result_buffer
                     = cpu->execute.rs1_value + cpu->execute.rs2_value;
 
@@ -368,10 +379,10 @@ APEX_writeback(APEX_CPU *cpu)
         switch (cpu->writeback.opcode)
         {
             case OPCODE_ADD:
-            {
-                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
-                break;
-            }
+            // {
+            //     cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+            //     break;
+            // }
 
             case OPCODE_LOAD:
             {
