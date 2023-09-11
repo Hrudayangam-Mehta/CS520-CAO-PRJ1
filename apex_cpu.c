@@ -296,7 +296,7 @@ APEX_decode(APEX_CPU *cpu)
             case OPCODE_ADDL:
             {
                 cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                //will get from immediate
                 break;
             }
         
@@ -749,13 +749,21 @@ APEX_writeback(APEX_CPU *cpu)
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
                 break;
             }
+            case OPCODE_SUBL:
+            {
+                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                break;
+            }
+            case OPCODE_ADDL:
+            {
+                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                break;
+            }
 
             case OPCODE_DIV:
             case OPCODE_AND:
             case OPCODE_OR:
             case OPCODE_XOR:
-            case OPCODE_SUBL:
-            case OPCODE_ADDL:
             case OPCODE_CMP:
             case OPCODE_CML:
             case OPCODE_BP:
