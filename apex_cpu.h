@@ -19,6 +19,7 @@ typedef struct APEX_Instruction
     int rd;
     int rs1;
     int rs2;
+    int rs3; //added for store
     int imm;
 } APEX_Instruction;
 
@@ -30,6 +31,7 @@ typedef struct CPU_Stage
     int opcode;
     int rs1;
     int rs2;
+    int rs3; //added for store 
     int rd;
     int imm;
     int rs1_value;

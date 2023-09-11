@@ -303,7 +303,18 @@ APEX_decode(APEX_CPU *cpu)
 
             case OPCODE_LOAD:
             {
+                // cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                // Result_buffer value is written into rd register
                 cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                // cpu->decode.rd = 1;
+                break;
+            }
+
+            case OPCODE_STORE:
+            {
+                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                cpu->decode.rd = -1;
                 break;
             }
 
@@ -596,15 +607,19 @@ APEX_execute(APEX_CPU *cpu)
 
             case OPCODE_STORE:
             {
+                
+                cpu->execute.result_buffer = cpu->execute.rs1_value;
+                
                 cpu->execute.memory_address
                     = cpu->execute.rs2_value + cpu->execute.imm;
+            
                 break;
             }
 
 
 
             case OPCODE_LOAD:
-            {
+            { 
                 cpu->execute.memory_address
                     = cpu->execute.rs1_value + cpu->execute.imm;
                 break;
@@ -761,9 +776,26 @@ APEX_writeback(APEX_CPU *cpu)
             }
 
             case OPCODE_DIV:
+            {
+                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                break;
+            }
             case OPCODE_AND:
+            {
+                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                break;
+            }
+
             case OPCODE_OR:
+            {
+                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                break;
+            }
             case OPCODE_XOR:
+            {
+                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                break;
+            }
             case OPCODE_CMP:
             case OPCODE_CML:
             case OPCODE_BP:
@@ -781,6 +813,11 @@ APEX_writeback(APEX_CPU *cpu)
             case OPCODE_LOAD:
             {
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                break;
+            }
+
+            case OPCODE_STORE:
+            {
                 break;
             }
 

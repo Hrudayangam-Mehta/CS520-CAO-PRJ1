@@ -203,7 +203,7 @@ create_APEX_instruction(APEX_Instruction *ins, char *buffer)
             break;
         }
 
-        
+
         case OPCODE_MUL:
         {
             ins->rd = get_num_from_string(tokens[0]);
@@ -264,11 +264,52 @@ create_APEX_instruction(APEX_Instruction *ins, char *buffer)
         }
 
         case OPCODE_BZ:
+        {
+            ins->imm = get_num_from_string(tokens[0]);
+            break;
+        }
+
         case OPCODE_BNZ:
         {
             ins->imm = get_num_from_string(tokens[0]);
             break;
         }
+
+        /* LOAD+ and STORE+ 
+        Memory instructions include the LOAD, STORE, LOAD+ and STORE+:
+        LOAD and STORE both include a literal value whose content is 
+        added to a register to compute the memory address and their 
+        semantics are as defined in the class notes/pdfs of the PowerPoints. 
+        The LOAD+ and STORE+ instructions have the same semantics as the LOAD 
+        and the STORE, respectively, but in addition increment the source register 
+        used for memory address calculation by 4 once the original value of that 
+        source register is read out (which happens in this pipeline in the D/RF stage). 
+        The increment is implemented by a dedicated logic within the EX stage, that 
+        operates in parallel with the ALU used for address calculation. Updates to 
+        the source register used for memory calculation by the LOAD+ and STORE+ are 
+        made when these instructions move into the WB stage. Assume that an extra write
+        port exists on the register file for supporting the write for the update to 
+        the source register used for address calculation.
+        
+        case OPCODE_LOADL:
+        {
+            ins->rd = get_num_from_string(tokens[0]);
+            ins->rs1 = get_num_from_string(tokens[1]);
+            ins->imm = get_num_from_string(tokens[2]);
+            break;
+        }
+
+        case OPCODE_STOREL:
+        {
+            ins->rs1 = get_num_from_string(tokens[0]);
+            ins->rs2 = get_num_from_string(tokens[1]);
+            ins->imm = get_num_from_string(tokens[2]);
+            break;
+        }
+
+        */
+
+
     }
     /* Fill in rest of the instructions accordingly */
 }
