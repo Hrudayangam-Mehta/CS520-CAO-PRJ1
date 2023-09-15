@@ -138,7 +138,7 @@ print_instruction(const CPU_Stage *stage)
 
         case OPCODE_CML:
         {
-            printf("%s,R%d,R%d ", stage->opcode_str, stage->rs1, stage->rs2);
+            printf("%s,R%d,R%d ", stage->opcode_str, stage->rs1, stage->imm);
             break;
         }
 
@@ -353,7 +353,8 @@ APEX_decode(APEX_CPU *cpu)
             case OPCODE_CML:
             {
                 cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                //will get from immediate
+
 
                 break;
             }
@@ -522,13 +523,15 @@ APEX_execute(APEX_CPU *cpu)
 
             case OPCODE_CML:
             {
-                if (cpu->execute.rs1_value != cpu->execute.rs2_value)
+                if (cpu->execute.rs1_value == cpu->execute.imm)
                 {
                     cpu->zero_flag = TRUE;
+                    printf("CML result buffer checking cml if true : %d\n", cpu->execute.result_buffer);
                 } 
                 else 
                 {
                     cpu->zero_flag = FALSE;
+                    printf("CML result buffer checking cml if false: %d\n", cpu->execute.result_buffer);
                 }
                 break;
             }
@@ -848,6 +851,11 @@ APEX_writeback(APEX_CPU *cpu)
                 break;
             }
             case OPCODE_CML:
+            {
+                //FOR TESTING PRINT STATEMENT
+                // printf("CML result buffer: %d\n", cpu->writeback.result_buffer);
+                break;
+            }
             case OPCODE_BP:
             case OPCODE_BNP:
             case OPCODE_BN:
