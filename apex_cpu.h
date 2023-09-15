@@ -39,6 +39,8 @@ typedef struct CPU_Stage
     int result_buffer;
     int memory_address;
     int has_insn;
+
+    int stalling_value; //added for stalling
 } CPU_Stage;
 
 /* Model of APEX CPU */

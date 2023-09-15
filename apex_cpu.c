@@ -198,7 +198,7 @@ APEX_fetch(APEX_CPU *cpu)
 {
     APEX_Instruction *current_ins;
 
-    if (cpu->fetch.has_insn)
+    if (cpu->fetch.has_insn && !cpu->fetch.stalling_value)
     {
         /* This fetches new branch target instruction from next cycle */
         if (cpu->fetch_from_next_cycle == TRUE)
@@ -223,10 +223,32 @@ APEX_fetch(APEX_CPU *cpu)
         cpu->fetch.imm = current_ins->imm;
 
         /* Update PC for next instruction */
-        cpu->pc += 4;
 
-        /* Copy data from fetch latch to decode latch*/
-        cpu->decode = cpu->fetch;
+        // cpu->pc += 4;
+
+        // /* Copy data from fetch latch to decode latch*/
+        // cpu->decode = cpu->fetch;
+
+        if(!cpu->decode.stalling_value)
+        {
+            cpu->pc += 4;
+            cpu->decode = cpu->fetch;
+        }
+         else if (cpu->fetch.stalling_value)
+        {
+            if(!cpu->decode.stalling_value)
+            {
+                cpu->fetch.stalling_value = 0;
+                cpu->pc += 4;
+                cpu->decode = cpu->fetch;
+            }
+            
+        }
+        else
+        {
+            cpu->fetch.stalling_value = 1;
+        }
+        
 
         if (ENABLE_DEBUG_MESSAGES)
         {
@@ -234,7 +256,7 @@ APEX_fetch(APEX_CPU *cpu)
         }
 
         /* Stop fetching new instructions if HALT is fetched */
-        if (cpu->fetch.opcode == OPCODE_HALT)
+        if (cpu->fetch.opcode == OPCODE_HALT && !cpu->decode.stalling_value)
         {
             cpu->fetch.has_insn = FALSE;
         }
@@ -249,17 +271,33 @@ APEX_fetch(APEX_CPU *cpu)
 static void
 APEX_decode(APEX_CPU *cpu)
 {
+
+
     if (cpu->decode.has_insn)
     {
         /* Read operands from register file based on the instruction type */
         switch (cpu->decode.opcode)
         {
             case OPCODE_ADD:
+           {
+
+            if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rs2] && !cpu->flags_for_regs[cpu->decode.rd])
             {
+                cpu->decode.stalling_value = 0;
+                //update flags
+                cpu->flags_for_regs[cpu->decode.rd] = 1;
+
                 cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
                 cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
-                break;
             }
+            else
+            {
+                cpu->decode.stalling_value = 1;
+                cpu->fetch_from_next_cycle = TRUE;
+            }
+            
+
+           }
 
             case OPCODE_SUB:
             {
@@ -339,7 +377,17 @@ APEX_decode(APEX_CPU *cpu)
             case OPCODE_MOVC:
             {
                 /* MOVC doesn't have register operands */
-                break;
+                if (!cpu->flags_for_regs[cpu->decode.rd])
+                {
+                    cpu->flags_for_regs[cpu->decode.rd] = 1;
+                    cpu->decode.stalling_value = 0;
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                }
+
+
             }
 
             case OPCODE_CMP:
@@ -370,8 +418,20 @@ APEX_decode(APEX_CPU *cpu)
         }
 
         /* Copy data from decode latch to execute latch*/
-        cpu->execute = cpu->decode;
-        cpu->decode.has_insn = FALSE;
+        // only execute when the register is not busy
+        
+        // cpu->execute = cpu->decode;
+        // cpu->decode.has_insn = FALSE;
+
+     // if decode.stalling_value is 0 then only copy the data from decode to execute
+     if(!cpu->decode.stalling_value)
+        {
+            cpu->execute = cpu->decode;
+            cpu->decode.has_insn = FALSE;
+        }
+        
+        
+          
 
         if (ENABLE_DEBUG_MESSAGES)
         {
@@ -798,6 +858,8 @@ APEX_writeback(APEX_CPU *cpu)
             case OPCODE_ADD:
             {
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                //update the flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
                 break;
             }
             
@@ -881,6 +943,8 @@ APEX_writeback(APEX_CPU *cpu)
             case OPCODE_MOVC: 
             {
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                //update the flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
                 break;
             }
         }
