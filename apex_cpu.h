@@ -55,6 +55,8 @@ typedef struct APEX_CPU
     int zero_flag;                 /* {TRUE, FALSE} Used by BZ and BNZ to branch */
     int fetch_from_next_cycle;
 
+    int flags_for_regs[REG_FILE_SIZE]; //added for flags
+
     /* Pipeline stages */
     CPU_Stage fetch;
     CPU_Stage decode;

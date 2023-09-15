@@ -118,6 +118,16 @@ set_opcode_str(const char *opcode_str)
     {
         return OPCODE_HALT;
     }
+    
+    if(strcmp(opcode_str, "NOP") == 0)
+    {
+        return OPCODE_NOP;
+    }
+
+    if(strcmp(opcode_str, "CMP") == 0)
+    {
+        return OPCODE_CMP;
+    }   
 
     assert(0 && "Invalid opcode");
     return 0;
@@ -308,6 +318,18 @@ create_APEX_instruction(APEX_Instruction *ins, char *buffer)
         }
 
         */
+
+        case OPCODE_NOP:
+        {
+            break;
+        }
+
+        case OPCODE_CMP:
+        {
+            ins->rs1 = get_num_from_string(tokens[0]);
+            ins->rs2 = get_num_from_string(tokens[1]);
+            break;
+        }
 
 
     }
