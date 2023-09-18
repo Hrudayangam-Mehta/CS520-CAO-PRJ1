@@ -295,17 +295,30 @@ APEX_decode(APEX_CPU *cpu)
                 cpu->decode.stalling_value = 1;
                 cpu->fetch_from_next_cycle = TRUE;
             }
+            break;
             
 
            }
 
             case OPCODE_SUB:
             {
-                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rs2] && !cpu->flags_for_regs[cpu->decode.rd])
+                {
+                    cpu->decode.stalling_value = 0;
+                    //update flags
+                    cpu->flags_for_regs[cpu->decode.rd] = 1;
+
+                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                    cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                    cpu->fetch_from_next_cycle = TRUE;
+                }
                 break;
             }
-
+            
             case OPCODE_MUL:
             {
                 cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
@@ -866,6 +879,9 @@ APEX_writeback(APEX_CPU *cpu)
             case OPCODE_SUB:
             {
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
+
                 break;
             }
             
