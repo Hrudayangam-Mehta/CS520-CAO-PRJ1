@@ -321,15 +321,78 @@ APEX_decode(APEX_CPU *cpu)
             
             case OPCODE_MUL:
             {
-                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rs2] && !cpu->flags_for_regs[cpu->decode.rd])
+                {
+                    cpu->decode.stalling_value = 0;
+                    //update flags
+                    cpu->flags_for_regs[cpu->decode.rd] = 1;
+
+                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                    cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                    cpu->fetch_from_next_cycle = TRUE;
+                }
                 break;
             }
+            
 
             case OPCODE_DIV:
             {
-                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rs2] && !cpu->flags_for_regs[cpu->decode.rd])
+                {
+                    cpu->decode.stalling_value = 0;
+                    //update flags
+                    cpu->flags_for_regs[cpu->decode.rd] = 1;
+
+                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                    cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                    cpu->fetch_from_next_cycle = TRUE;
+                }
+                break;
+            }
+
+            case OPCODE_SUBL:
+            {
+                if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rd])
+                {
+                    cpu->decode.stalling_value = 0;
+                    //update flags
+                    cpu->flags_for_regs[cpu->decode.rd] = 1;
+
+                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                    //will get from immediate
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                    cpu->fetch_from_next_cycle = TRUE;
+                }
+                break;
+            }
+
+            case OPCODE_ADDL:
+            {
+                if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rd])
+                {
+                    cpu->decode.stalling_value = 0;
+                    //update flags
+                    cpu->flags_for_regs[cpu->decode.rd] = 1;
+
+                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                    //will get from immediate
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                    cpu->fetch_from_next_cycle = TRUE;
+                }
                 break;
             }
 
@@ -354,20 +417,7 @@ APEX_decode(APEX_CPU *cpu)
                 break;
             }
 
-            case OPCODE_SUBL:
-            {
-                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                //will get from immediate
-
-                break;
-            }
-
-            case OPCODE_ADDL:
-            {
-                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                //will get from immediate
-                break;
-            }
+           
         
 
             case OPCODE_LOAD:
@@ -879,7 +929,7 @@ APEX_writeback(APEX_CPU *cpu)
             case OPCODE_SUB:
             {
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
-
+                //update the flags
                 cpu->flags_for_regs[cpu->writeback.rd] = 0;
 
                 break;
@@ -888,22 +938,30 @@ APEX_writeback(APEX_CPU *cpu)
             case OPCODE_MUL:
             {
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                //update the flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
                 break;
             }
             case OPCODE_SUBL:
             {
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                // update the flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
                 break;
             }
             case OPCODE_ADDL:
             {
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                // update the flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
                 break;
             }
 
             case OPCODE_DIV:
             {
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                //update the flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
                 break;
             }
             case OPCODE_AND:
