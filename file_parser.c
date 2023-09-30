@@ -134,6 +134,11 @@ set_opcode_str(const char *opcode_str)
         return OPCODE_CML;
     }
 
+    if(strcmp(opcode_str, "JUMP") == 0)
+    {
+        return OPCODE_JUMP;
+    }
+
     assert(0 && "Invalid opcode");
     return 0;
 }
@@ -342,6 +347,13 @@ create_APEX_instruction(APEX_Instruction *ins, char *buffer)
             //will get imm 
             ins->imm = get_num_from_string(tokens[1]);
 
+            break;
+        }
+
+        case OPCODE_JUMP:
+        {
+            ins->rs1 = get_num_from_string(tokens[0]);
+            ins->imm = get_num_from_string(tokens[1]);
             break;
         }
 
