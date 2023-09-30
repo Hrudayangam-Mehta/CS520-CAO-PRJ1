@@ -477,11 +477,25 @@ APEX_decode(APEX_CPU *cpu)
 
             case OPCODE_STORE:
             {
-                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
-                cpu->decode.rd = -1;
+                if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rs2])
+                {
+                    cpu->decode.stalling_value = 0;
+                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                    cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                    
+                    //update flags
+                    cpu->flags_for_regs[cpu->decode.rs1] = 1;
+
+                    //will get 1 VAL from immediate
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                    cpu->fetch_from_next_cycle = TRUE;
+                }
                 break;
             }
+            
 
             case OPCODE_MOVC:
             {
@@ -824,7 +838,8 @@ APEX_execute(APEX_CPU *cpu)
 
             case OPCODE_STORE:
             {
-                
+                // print to check if it is working
+                printf("STORE result buffer: %d\n", cpu->execute.result_buffer);
                 cpu->execute.result_buffer = cpu->execute.rs1_value;
                 
                 cpu->execute.memory_address
@@ -1069,6 +1084,13 @@ APEX_writeback(APEX_CPU *cpu)
 
             case OPCODE_STORE:
             {
+                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                //print to check if this is working
+                printf("STORE result buffer: %d\n", cpu->writeback.result_buffer);
+                // update flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
+                // cpu->fetch.stalling_value = 0;
+                // cpu->decode.stalling_value = 0;
                 break;
             }
 
