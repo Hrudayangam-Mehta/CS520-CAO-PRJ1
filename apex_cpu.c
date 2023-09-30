@@ -458,10 +458,20 @@ APEX_decode(APEX_CPU *cpu)
 
             case OPCODE_LOAD:
             {
-                // cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                // Result_buffer value is written into rd register
-                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                // cpu->decode.rd = 1;
+                if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rd])
+                {
+                    cpu->decode.stalling_value = 0;
+                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+
+                    //update flags
+                    cpu->flags_for_regs[cpu->decode.rd] = 1;
+                    //will get 1 VAL from immediate
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                    cpu->fetch_from_next_cycle = TRUE;
+                }
                 break;
             }
 
@@ -1049,6 +1059,11 @@ APEX_writeback(APEX_CPU *cpu)
             case OPCODE_LOAD:
             {
                 cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                //print to check if this is working
+                printf("LOAD result buffer: %d\n", cpu->writeback.result_buffer);
+                
+                // update flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
                 break;
             }
 
