@@ -153,6 +153,14 @@ print_instruction(const CPU_Stage *stage)
             printf("%s,R%d,#%d ", stage->opcode_str, stage->rs1, stage->imm);
             break;
         }
+
+        case OPCODE_JALR:
+        {
+            printf("%s,R%d, R%d, #%d ", stage->opcode_str, stage->rd, stage->rs1, stage->imm);
+            break;
+        }
+
+        
     }
 }
 
@@ -548,7 +556,7 @@ APEX_decode(APEX_CPU *cpu)
             case OPCODE_JUMP:
             {
                 // print to say we have reached execute stage
-                printf("Reached DECLDE stage\n");
+                // printf("Reached DECLDE stage\n");
                 if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rd])
                 {
                     cpu->decode.stalling_value = 0;
@@ -562,6 +570,26 @@ APEX_decode(APEX_CPU *cpu)
                 }
                 break;
             }
+
+            case OPCODE_JALR:
+            {
+                // print to say we have reached execute stage
+                printf("Reached DECLDE stage\n");
+                if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rd] && !cpu->flags_for_regs[cpu->decode.rs2])
+                {
+                    cpu->decode.stalling_value = 0;
+                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                    cpu->flags_for_regs[cpu->decode.rd] = 1;
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                    cpu->fetch_from_next_cycle = TRUE;
+                }
+                break;
+            }
+
+
 
         }
 
@@ -842,7 +870,8 @@ APEX_execute(APEX_CPU *cpu)
 
             case OPCODE_JALR:
             {
-                cpu->pc = cpu->execute.pc + cpu->execute.imm;
+                cpu->execute.result_buffer = cpu->execute.pc + 4;
+                cpu->pc = cpu->execute.rs1_value + cpu->execute.imm;
                     
                 /* Since we are using reverse callbacks for pipeline stages, 
                  * this will prevent the new instruction from being fetched in the current cycle*/
@@ -1093,9 +1122,22 @@ APEX_writeback(APEX_CPU *cpu)
             {
                 // print to say we have reached writeback stage
                 printf("Reached writeback stage\n");
+                // update flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
                 break;
             }
             case OPCODE_JALR:
+            {
+                // print to say we have reached writeback stage
+                printf("Reached writeback stage\n");
+
+                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                
+                // update flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
+
+                break;
+            }
             case OPCODE_NOP:
             {
                 break;
