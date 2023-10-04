@@ -124,6 +124,33 @@ print_instruction(const CPU_Stage *stage)
             break;
         }
 
+        
+        case OPCODE_BP:
+        {
+            printf("%s,#%d ", stage->opcode_str, stage->imm);
+            break;
+        }
+
+        case OPCODE_BNP:
+        {
+            printf("%s,#%d ", stage->opcode_str, stage->imm);
+            break;
+        }
+
+        case OPCODE_BN:
+        {
+            printf("%s,#%d ", stage->opcode_str, stage->imm);
+            break;
+        }
+
+        case OPCODE_BNN:
+        {
+            printf("%s,#%d ", stage->opcode_str, stage->imm);
+            break;
+        }
+
+
+
         case OPCODE_HALT:
         {
             printf("%s", stage->opcode_str);
@@ -527,21 +554,52 @@ APEX_decode(APEX_CPU *cpu)
                     cpu->decode.stalling_value = 1;
                 }
 
-
+                break;
             }
 
             case OPCODE_CMP:
             {
-                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                // cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                // cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+
+                if(!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rs2])
+                {
+                    cpu->decode.stalling_value = 0;
+                    
+                    cpu->flags_for_regs[cpu->decode.rd] = 1;
+
+                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                    cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
+                    //update flags
+                  
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                    cpu->fetch_from_next_cycle = TRUE;
+                }
 
                 break;
             }
 
             case OPCODE_CML:
             {
-                cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                // cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
                 //will get from immediate
+
+                if(!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rd])
+                {
+                    cpu->decode.stalling_value = 0;
+                    cpu->flags_for_regs[cpu->decode.rd] = 1;
+
+                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
+                    //update flags
+                }
+                else
+                {
+                    cpu->decode.stalling_value = 1;
+                    cpu->fetch_from_next_cycle = TRUE;
+                }
 
 
                 break;
@@ -589,6 +647,109 @@ APEX_decode(APEX_CPU *cpu)
                 break;
             }
 
+            // case OPCODE_BZ:
+            // {
+            //     // print to say we have reached execute stage
+            //     // printf("Reached DECLDE stage\n");
+            //     if (!cpu->flags_for_regs[cpu->decode.rd])
+            //     {
+            //         cpu->decode.stalling_value = 0;
+            //         cpu->flags_for_regs[cpu->decode.rd] = 1;
+            //     }
+            //     else
+            //     {
+            //         cpu->decode.stalling_value = 1;
+            //         cpu->fetch_from_next_cycle = TRUE;
+            //     }
+            //     break;
+            // }
+
+            // case OPCODE_BNZ:
+            // {
+            //     // print to say we have reached execute stage
+            //     // printf("Reached DECLDE stage\n");
+            //     if (!cpu->flags_for_regs[cpu->decode.rd])
+            //     {
+            //         cpu->decode.stalling_value = 0;
+            //         cpu->flags_for_regs[cpu->decode.rd] = 1;
+            //     }
+            //     else
+            //     {
+            //         cpu->decode.stalling_value = 1;
+            //         cpu->fetch_from_next_cycle = TRUE;
+            //     }
+            //     break;
+            // }
+
+            // case OPCODE_BP:
+            // {
+            //     // print to say we have reached execute stage
+            //     // printf("Reached DECLDE stage\n");
+            //     if (!cpu->flags_for_regs[cpu->decode.rd])
+            //     {
+            //         cpu->decode.stalling_value = 0;
+            //         cpu->flags_for_regs[cpu->decode.rd] = 1;
+            //     }
+            //     else
+            //     {
+            //         cpu->decode.stalling_value = 1;
+            //         cpu->fetch_from_next_cycle = TRUE;
+            //     }
+            //     break;
+            // }
+
+            // case OPCODE_BNP:
+            // {
+            //     // print to say we have reached execute stage
+            //     // printf("Reached DECLDE stage\n");
+            //     if (!cpu->flags_for_regs[cpu->decode.rd])
+            //     {
+            //         cpu->decode.stalling_value = 0;
+            //         cpu->flags_for_regs[cpu->decode.rd] = 1;
+            //     }
+            //     else
+            //     {
+            //         cpu->decode.stalling_value = 1;
+            //         cpu->fetch_from_next_cycle = TRUE;
+            //     }
+            //     break;
+            // }
+
+            // case OPCODE_BN:
+            // {
+            //     // print to say we have reached execute stage
+            //     // printf("Reached DECLDE stage\n");
+            //     if (!cpu->flags_for_regs[cpu->decode.rd])
+            //     {
+            //         cpu->decode.stalling_value = 0;
+            //         cpu->flags_for_regs[cpu->decode.rd] = 1;
+            //     }
+            //     else
+            //     {
+            //         cpu->decode.stalling_value = 1;
+            //         cpu->fetch_from_next_cycle = TRUE;
+            //     }
+            //     break;
+            // }
+
+            // case OPCODE_BNN:
+            // {
+            //     // print to say we have reached execute stage
+            //     // printf("Reached DECLDE stage\n");
+            //     if (!cpu->flags_for_regs[cpu->decode.rd])
+            //     {
+            //         cpu->decode.stalling_value = 0;
+            //         cpu->flags_for_regs[cpu->decode.rd] = 1;
+            //     }
+            //     else
+            //     {
+            //         cpu->decode.stalling_value = 1;
+            //         cpu->fetch_from_next_cycle = TRUE;
+            //     }
+            //     break;
+            // }
+
+
 
 
         }
@@ -618,14 +779,14 @@ APEX_decode(APEX_CPU *cpu)
 
 
 // SetzeroFlag function so as to not repeat the same code in the execute stage
-void Setzero_Flag(APEX_CPU *cpu)
-{
-    if (cpu->execute.result_buffer == 0){
-        cpu->zero_flag = TRUE;
-    } else {
-        cpu->zero_flag = FALSE;
-    }
-}
+// void Setzero_Flag(APEX_CPU *cpu)
+// {
+//     if (cpu->execute.result_buffer == 0){
+//         cpu->zero_flag = TRUE;
+//     } else {
+//         cpu->zero_flag = FALSE;
+//     }
+// }
 
 
 /*
@@ -648,7 +809,30 @@ APEX_execute(APEX_CPU *cpu)
                     = cpu->execute.rs1_value + cpu->execute.rs2_value;
 
                 /* Set the zero flag based on the result buffer */
-                Setzero_Flag(cpu);
+                // Setzero_Flag(cpu);
+
+
+                if (cpu->execute.result_buffer == 0)
+                {
+                    cpu->zero_flag = TRUE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                
+                else if (cpu->execute.result_buffer > 0) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
+                }
+                break;
+                }
 
                 // the below part is not required as we are setting the zero flag in the setZeroFlag function
                 // if (cpu->execute.result_buffer == 0)
@@ -659,8 +843,9 @@ APEX_execute(APEX_CPU *cpu)
                 // {
                 //     cpu->zero_flag = FALSE;
                 // }
-                break;
-            }
+                // break;
+            // }
+            
 
             case OPCODE_SUB:
             {
@@ -668,7 +853,27 @@ APEX_execute(APEX_CPU *cpu)
                     = cpu->execute.rs1_value - cpu->execute.rs2_value;
 
                 /* Set the zero flag based on the result buffer */
-                Setzero_Flag(cpu);
+                // Setzero_Flag(cpu);
+                if (cpu->execute.result_buffer == 0)
+                {
+                    cpu->zero_flag = TRUE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                
+                else if (cpu->execute.result_buffer > 0) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
+                }
+                
                 break;
             }
 
@@ -678,7 +883,26 @@ APEX_execute(APEX_CPU *cpu)
                     = cpu->execute.rs1_value * cpu->execute.rs2_value;
 
                 /* Set the zero flag based on the result buffer */
-                Setzero_Flag(cpu);
+                // Setzero_Flag(cpu);
+                if (cpu->execute.result_buffer == 0)
+                {
+                    cpu->zero_flag = TRUE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                
+                else if (cpu->execute.result_buffer > 0) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
+                }
                 break;
             }
 
@@ -688,7 +912,26 @@ APEX_execute(APEX_CPU *cpu)
                     = cpu->execute.rs1_value / cpu->execute.rs2_value;
 
                 /* Set the zero flag based on the result buffer */
-                Setzero_Flag(cpu);
+                // Setzero_Flag(cpu);
+                if (cpu->execute.result_buffer == 0)
+                {
+                    cpu->zero_flag = TRUE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                
+                else if (cpu->execute.result_buffer > 0) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
+                }
                 break;
             }
 
@@ -698,7 +941,26 @@ APEX_execute(APEX_CPU *cpu)
                     = cpu->execute.rs1_value & cpu->execute.rs2_value;
 
                 /* Set the zero flag based on the result buffer */
-                Setzero_Flag(cpu);
+                // Setzero_Flag(cpu);
+                if (cpu->execute.result_buffer == 0)
+                {
+                    cpu->zero_flag = TRUE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                
+                else if (cpu->execute.result_buffer > 0) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
+                }
                 break;
             }
 
@@ -708,7 +970,26 @@ APEX_execute(APEX_CPU *cpu)
                     = cpu->execute.rs1_value | cpu->execute.rs2_value;
 
                 /* Set the zero flag based on the result buffer */
-                Setzero_Flag(cpu);
+                // Setzero_Flag(cpu);
+                if (cpu->execute.result_buffer == 0)
+                {
+                    cpu->zero_flag = TRUE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                
+                else if (cpu->execute.result_buffer > 0) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
+                }
                 break;
             }
 
@@ -718,7 +999,26 @@ APEX_execute(APEX_CPU *cpu)
                     = cpu->execute.rs1_value ^ cpu->execute.rs2_value;
 
                 /* Set the zero flag based on the result buffer */
-                Setzero_Flag(cpu);
+                // Setzero_Flag(cpu);
+                if (cpu->execute.result_buffer == 0)
+                {
+                    cpu->zero_flag = TRUE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                
+                else if (cpu->execute.result_buffer > 0) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
+                }
                 break;
             }
 
@@ -728,7 +1028,26 @@ APEX_execute(APEX_CPU *cpu)
                     = cpu->execute.rs1_value - cpu->execute.imm;
 
                 /* Set the zero flag based on the result buffer */
-                Setzero_Flag(cpu);
+                // Setzero_Flag(cpu);
+                if (cpu->execute.result_buffer == 0)
+                {
+                    cpu->zero_flag = TRUE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                
+                else if (cpu->execute.result_buffer > 0) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
+                }
                 break;
             }
 
@@ -738,43 +1057,125 @@ APEX_execute(APEX_CPU *cpu)
                     = cpu->execute.rs1_value + cpu->execute.imm;
 
                 /* Set the zero flag based on the result buffer */
-                Setzero_Flag(cpu);
+                // Setzero_Flag(cpu);
+
+                // print result buffer
+                printf("Result buffer is %d\n", cpu->execute.result_buffer);
+                if (cpu->execute.result_buffer == 0)
+                {
+                    cpu->zero_flag = TRUE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                
+                else if (cpu->execute.result_buffer > 0) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
+                }
+
                 break;
             }
 
             case OPCODE_CMP:
             {
+                //update flags based on comparison
                 if (cpu->execute.rs1_value == cpu->execute.rs2_value)
                 {
                     cpu->zero_flag = TRUE;
-                    printf("CMP result buffer checking cmp if true : %d\n", cpu->execute.result_buffer);
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else if (cpu->execute.rs1_value > cpu->execute.rs2_value) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
                 } 
                 else 
                 {
                     cpu->zero_flag = FALSE;
-                    printf("CMP result buffer checking cmp if false: %d\n", cpu->execute.result_buffer);
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
                 }
                 break;
             }
 
             case OPCODE_CML:
             {
+                //update flags based on comparison
                 if (cpu->execute.rs1_value == cpu->execute.imm)
                 {
                     cpu->zero_flag = TRUE;
-                    printf("CML result buffer checking cml if true : %d\n", cpu->execute.result_buffer);
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = FALSE;
+                } 
+                else if (cpu->execute.rs1_value > cpu->execute.imm) 
+                {
+                    cpu->zero_flag = FALSE;
+                    cpu -> pos_flag = TRUE;
+                    cpu -> neg_flag = FALSE;
                 } 
                 else 
                 {
                     cpu->zero_flag = FALSE;
-                    printf("CML result buffer checking cml if false: %d\n", cpu->execute.result_buffer);
+                    cpu -> pos_flag = FALSE;
+                    cpu -> neg_flag = TRUE;
                 }
                 break;
             }
 
-            case OPCODE_BP:
+            case OPCODE_BZ:
             {
                 if (cpu->zero_flag == TRUE)
+                {
+                    /* Calculate new PC, and send it to fetch unit */
+                    cpu->pc = cpu->execute.pc + cpu->execute.imm;
+                    
+                    /* Since we are using reverse callbacks for pipeline stages, 
+                     * this will prevent the new instruction from being fetched in the current cycle*/
+                    cpu->fetch_from_next_cycle = TRUE;
+
+                    /* Flush previous stages */
+                    cpu->decode.has_insn = FALSE;
+
+                    /* Make sure fetch stage is enabled to start fetching from new PC */
+                    cpu->fetch.has_insn = TRUE;
+                }
+                break;
+            }
+
+            case OPCODE_BNZ:
+            {
+                if (cpu->zero_flag == FALSE)
+                {
+                    /* Calculate new PC, and send it to fetch unit */
+                    cpu->pc = cpu->execute.pc + cpu->execute.imm;
+                    
+                    /* Since we are using reverse callbacks for pipeline stages, 
+                     * this will prevent the new instruction from being fetched in the current cycle*/
+                    cpu->fetch_from_next_cycle = TRUE;
+
+                    /* Flush previous stages */
+                    cpu->decode.has_insn = FALSE;
+
+                    /* Make sure fetch stage is enabled to start fetching from new PC */
+                    cpu->fetch.has_insn = TRUE;
+                }
+                break;
+            }
+
+
+            case OPCODE_BP:
+            {
+                if(cpu->pos_flag == TRUE)
                 {
                     /* Calculate new PC, and send it to fetch unit */
                     cpu->pc = cpu->execute.pc + cpu->execute.imm;
@@ -794,7 +1195,7 @@ APEX_execute(APEX_CPU *cpu)
 
             case OPCODE_BNP:
             {
-                if (cpu->zero_flag == FALSE)
+                if(cpu->pos_flag == FALSE)
                 {
                     /* Calculate new PC, and send it to fetch unit */
                     cpu->pc = cpu->execute.pc + cpu->execute.imm;
@@ -814,7 +1215,7 @@ APEX_execute(APEX_CPU *cpu)
 
             case OPCODE_BN:
             {
-                if (cpu->zero_flag == TRUE)
+                if(cpu->neg_flag == TRUE)
                 {
                     /* Calculate new PC, and send it to fetch unit */
                     cpu->pc = cpu->execute.pc + cpu->execute.imm;
@@ -834,7 +1235,7 @@ APEX_execute(APEX_CPU *cpu)
 
             case OPCODE_BNN:
             {
-                if (cpu->zero_flag == FALSE)
+                if(cpu->neg_flag == FALSE)
                 {
                     /* Calculate new PC, and send it to fetch unit */
                     cpu->pc = cpu->execute.pc + cpu->execute.imm;
@@ -887,6 +1288,7 @@ APEX_execute(APEX_CPU *cpu)
 
             case OPCODE_NOP:
             {
+                /* NOP doesn't have any operation */
                 break;
             }
 
@@ -911,60 +1313,14 @@ APEX_execute(APEX_CPU *cpu)
                 break;
             }
 
-            case OPCODE_BZ:
-            {
-                if (cpu->zero_flag == TRUE)
-                {
-                    /* Calculate new PC, and send it to fetch unit */
-                    cpu->pc = cpu->execute.pc + cpu->execute.imm;
-                    
-                    /* Since we are using reverse callbacks for pipeline stages, 
-                     * this will prevent the new instruction from being fetched in the current cycle*/
-                    cpu->fetch_from_next_cycle = TRUE;
-
-                    /* Flush previous stages */
-                    cpu->decode.has_insn = FALSE;
-
-                    /* Make sure fetch stage is enabled to start fetching from new PC */
-                    cpu->fetch.has_insn = TRUE;
-                }
-                break;
-            }
-
-            case OPCODE_BNZ:
-            {
-                if (cpu->zero_flag == FALSE)
-                {
-                    /* Calculate new PC, and send it to fetch unit */
-                    cpu->pc = cpu->execute.pc + cpu->execute.imm;
-                    
-                    /* Since we are using reverse callbacks for pipeline stages, 
-                     * this will prevent the new instruction from being fetched in the current cycle*/
-                    cpu->fetch_from_next_cycle = TRUE;
-
-                    /* Flush previous stages */
-                    cpu->decode.has_insn = FALSE;
-
-                    /* Make sure fetch stage is enabled to start fetching from new PC */
-                    cpu->fetch.has_insn = TRUE;
-                }
-                break;
-            }
-
+            
             case OPCODE_MOVC: 
             {
                 cpu->execute.result_buffer = cpu->execute.imm;
 
-                /* Set the zero flag based on the result buffer */
-                if (cpu->execute.result_buffer == 0)
-                {
-                    cpu->zero_flag = TRUE;
-                } 
-                else 
-                {
-                    cpu->zero_flag = FALSE;
-                }
+                // no flags for MOVC, LOAD, LOADP, STORE, STOREP
                 break;
+                
             }
         }
 
@@ -1106,12 +1462,18 @@ APEX_writeback(APEX_CPU *cpu)
             {
                 //FOR TESTING PRINT STATEMENT
                 // printf("CMP result buffer: %d\n", cpu->writeback.result_buffer);
+                // cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                // update flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0;
                 break;
             }
             case OPCODE_CML:
             {
                 //FOR TESTING PRINT STATEMENT
                 // printf("CML result buffer: %d\n", cpu->writeback.result_buffer);
+                // cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
+                // update flags
+                cpu->flags_for_regs[cpu->writeback.rd] = 0; 
                 break;
             }
             case OPCODE_BP:

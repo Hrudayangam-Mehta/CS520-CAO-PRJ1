@@ -114,6 +114,9 @@ set_opcode_str(const char *opcode_str)
         return OPCODE_BNZ;
     }
 
+    // BP 
+    
+
     if (strcmp(opcode_str, "HALT") == 0)
     {
         return OPCODE_HALT;
@@ -143,6 +146,34 @@ set_opcode_str(const char *opcode_str)
     {
         return OPCODE_JALR;
     }
+
+    // for BP BNP BN BNN
+    if(strcmp(opcode_str, "BP") == 0)
+    {
+        return OPCODE_BNP;
+    }
+
+    if(strcmp(opcode_str, "BNP") == 0)
+    {
+        return OPCODE_BNP;
+    }
+
+    if(strcmp(opcode_str, "BN") == 0)
+    {
+        return OPCODE_BN;
+    }
+
+    if(strcmp(opcode_str, "BNN") == 0)
+    {
+        return OPCODE_BNN;
+    }
+
+    if(strcmp(opcode_str, "HALT") == 0)
+    {
+        return OPCODE_HALT;
+    }
+
+
 
     assert(0 && "Invalid opcode");
     return 0;
@@ -299,6 +330,37 @@ create_APEX_instruction(APEX_Instruction *ins, char *buffer)
             ins->imm = get_num_from_string(tokens[0]);
             break;
         }
+
+        case OPCODE_BP:
+        {
+            ins->imm = get_num_from_string(tokens[0]);
+            break;
+        }
+
+        case OPCODE_BNP:
+        {
+            ins->imm = get_num_from_string(tokens[0]);
+            break;
+        }
+
+        case OPCODE_BN:
+        {
+            ins->imm = get_num_from_string(tokens[0]);
+            break;
+        }
+
+        case OPCODE_BNN:
+        {
+            ins->imm = get_num_from_string(tokens[0]);
+            break;
+        }
+
+        case OPCODE_HALT:
+        {
+            break;
+        }
+
+        
 
         /* LOAD+ and STORE+ 
         Memory instructions include the LOAD, STORE, LOAD+ and STORE+:
