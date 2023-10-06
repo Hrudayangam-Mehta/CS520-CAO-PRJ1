@@ -63,6 +63,13 @@ typedef struct APEX_CPU
 
     int flags_for_regs[REG_FILE_SIZE]; //added for flags
 
+    //for forwarding
+    // track pending result in execute stage
+    int execute_result_pending;
+
+    // track pending result in memory stage
+    int memory_result_pending;
+
     /* Pipeline stages */
     CPU_Stage fetch;
     CPU_Stage decode;
