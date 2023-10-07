@@ -60,8 +60,7 @@
 // nop
 #define OPCODE_NOP 0x17
 
-#define OPCODE_STOREP 0x18
-#define OPCODE_LOADP 0x19
+
 
 
 

@@ -187,17 +187,7 @@ print_instruction(const CPU_Stage *stage)
             break;
         }
 
-        case OPCODE_LOADP:
-        {
-            printf("%s,R%d,R%d,#%d ", stage->opcode_str, stage->rd, stage->rs1, stage->imm);
-            break;
-        }
-
-        case OPCODE_STOREP:
-        {
-            printf("%s,R%d,R%d,#%d ", stage->opcode_str, stage->rs1, stage->rs2, stage->imm);
-            break;
-        }
+        
 
 
 
@@ -554,47 +544,8 @@ APEX_decode(APEX_CPU *cpu)
                 break;
             }
 
-            case OPCODE_LOADP:
-            {
-                if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rd])
-                {
-                    cpu->decode.stalling_value = 0;
-                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-
-                    //update flags
-                    cpu->flags_for_regs[cpu->decode.rd] = 1;
-                    //will get 1 VAL from immediate
-                }
-                else
-                {
-                    cpu->decode.stalling_value = 1;
-                    cpu->fetch_from_next_cycle = TRUE;
-                }
-
-                break;
-            }
-
-            case OPCODE_STOREP:
-            {
-                if (!cpu->flags_for_regs[cpu->decode.rs1] && !cpu->flags_for_regs[cpu->decode.rs2])
-                {
-                    cpu->decode.stalling_value = 0;
-                    cpu->decode.rs1_value = cpu->regs[cpu->decode.rs1];
-                    cpu->decode.rs2_value = cpu->regs[cpu->decode.rs2];
-                    
-                    //update flags
-                    cpu->flags_for_regs[cpu->decode.rs1] = 1;
-
-                    //will get 1 VAL from immediate
-                }
-                else
-                {
-                    cpu->decode.stalling_value = 1;
-                    cpu->fetch_from_next_cycle = TRUE;
-                }
-
-                break;
-            }
+            
+            
             
 
             case OPCODE_MOVC:
@@ -1380,20 +1331,9 @@ APEX_execute(APEX_CPU *cpu)
             }
         
 
-        case OPCODE_LOADP:
-        {
-            cpu->execute.memory_address
-                = cpu->execute.rs1_value + cpu->execute.rs2_value;
-            break;
-        }
+        
 
-        case OPCODE_STOREP:
-        {
-            cpu->execute.result_buffer = cpu->execute.rs1_value;
-            cpu->execute.memory_address
-                = cpu->execute.rs2_value + cpu->execute.imm;
-            break;
-        }
+        
 
         }
 
@@ -1609,21 +1549,9 @@ APEX_writeback(APEX_CPU *cpu)
                 break;
             }
 
-            case OPCODE_LOADP:
-            {
-                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
-                //update the flags
-                cpu->flags_for_regs[cpu->writeback.rd] = 0;
-                break;
-            }
+           
 
-            case OPCODE_STOREP:
-            {
-                cpu->regs[cpu->writeback.rd] = cpu->writeback.result_buffer;
-                //update the flags
-                cpu->flags_for_regs[cpu->writeback.rd] = 0;
-                break;
-            }   
+            
 
 
 
