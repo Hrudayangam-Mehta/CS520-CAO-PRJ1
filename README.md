@@ -1,6 +1,8 @@
 # APEX Pipeline Simulator v2.0
 A template for 5 Stage APEX In-order Pipeline
 
+PS: Please use this as a reference code and cite this, do not play with plag check. I am making this public to help my fellow friends.
+
 ## Notes:
 
  - This code is a simple implementation template of a working 5-Stage APEX In-order Pipeline
